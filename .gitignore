@@ -1,9 +1,8 @@
-# Maven
+# Java/Maven
 target/
 *.class
-# IDE
-.idea/
-*.iml
+# VS Code
+.vscode/
 # Otros
 *.log
 .DS_Store
