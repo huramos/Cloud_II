@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  bff:
+    build:
+      context: ./microservice-bff
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+
+  usuarios:
+    build:
+      context: ./usuarios-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=8081
+      - SPRING_AUTOCONFIGURE_EXCLUDE=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  serverless-functions:
+    build:
+      context: ./serverless-functions
+    ports:
+      - "7071:80"
+    environment:
+      - FUNCTIONS_WORKER_RUNTIME=java
+      - AzureWebJobsStorage=UseDevelopmentStorage=true

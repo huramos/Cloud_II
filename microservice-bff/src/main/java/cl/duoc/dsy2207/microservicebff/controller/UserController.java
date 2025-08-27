@@ -3,42 +3,39 @@ package cl.duoc.dsy2207.microservicebff.controller;
 import cl.duoc.dsy2207.microservicebff.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpEntity;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Long, User> userStore = new HashMap<>(); // Almacén temporal
+    private final RestTemplate restTemplate;
+    private final String usuariosUrl = "http://usuarios:8081/api/users";
+    private final String functionsUrl = "http://localhost:7071/api/";
+
+    public UserController(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        if (user.getId() == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        userStore.put(user.getId(), user);
-        return ResponseEntity.ok(user);
+        return restTemplate.postForEntity(usuariosUrl, user, User.class);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User user = userStore.get(id);
-        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        return restTemplate.getForEntity(functionsUrl + "ReadDeleteUser?id=" + id, User.class);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        if (userStore.containsKey(id)) {
-            user.setId(id);
-            userStore.put(id, user);
-            return ResponseEntity.ok(user);
-        }
-        return ResponseEntity.notFound().build();
+        return restTemplate.exchange(functionsUrl + "CreateUpdateUser?id=" + id, HttpMethod.PUT, new HttpEntity<>(user), User.class);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        return userStore.remove(id) != null ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        restTemplate.delete(functionsUrl + "ReadDeleteUser?id=" + id);
+        return ResponseEntity.ok().build();
     }
 }

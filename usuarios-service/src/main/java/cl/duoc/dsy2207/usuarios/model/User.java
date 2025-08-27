@@ -1,4 +1,4 @@
-package cl.duoc.dsy2207.microservicebff.model;
+package cl.duoc.dsy2207.usuarios.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
